@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASWE_PDA", "ASWE_PDA\ASWE_PDA.csproj", "{4AC3749D-D24C-4A4B-863C-0AD1933BB940}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ASWE_PDA_Test", "ASWE_PDA_Test\ASWE_PDA_Test.csproj", "{AA1EFC71-A548-451C-9DBF-7A28E0829DDF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4AC3749D-D24C-4A4B-863C-0AD1933BB940}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4AC3749D-D24C-4A4B-863C-0AD1933BB940}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4AC3749D-D24C-4A4B-863C-0AD1933BB940}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4AC3749D-D24C-4A4B-863C-0AD1933BB940}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AA1EFC71-A548-451C-9DBF-7A28E0829DDF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AA1EFC71-A548-451C-9DBF-7A28E0829DDF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AA1EFC71-A548-451C-9DBF-7A28E0829DDF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AA1EFC71-A548-451C-9DBF-7A28E0829DDF}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
