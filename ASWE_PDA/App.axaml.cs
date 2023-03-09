@@ -1,3 +1,4 @@
+using ASWE_PDA.Models.ApplicationService;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
@@ -19,8 +20,10 @@ public partial class App : Application
         {
             desktop.MainWindow = new MainWindow
             {
-                DataContext = new MainWindowViewModel(),
+                DataContext = new MainWindowViewModel()
             };
+            
+            ApplicationService.OnStartUp();
         }
 
         base.OnFrameworkInitializationCompleted();

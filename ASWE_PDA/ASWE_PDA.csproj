@@ -36,7 +36,6 @@
     <ItemGroup>
       <Folder Include="src\Models\ApiServices" />
       <Folder Include="src\Models\DataService" />
-      <Folder Include="src\Models\SpeechService" />
     </ItemGroup>
 
     <ItemGroup>
