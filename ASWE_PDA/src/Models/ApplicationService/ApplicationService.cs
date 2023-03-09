@@ -48,7 +48,7 @@ public static class ApplicationService
         SpeechSynthesizer.Rate = 3;
 
         var vocabulary = new Choices();
-        vocabulary.Add("hey helix", "stop", "hello");
+        vocabulary.Add("helix", "stop", "hello");
 
         var grammarBuilder = new GrammarBuilder();
         grammarBuilder.Append(vocabulary);
@@ -66,7 +66,7 @@ public static class ApplicationService
     {
         switch (e.Result.Text.ToLower())
         {
-            case "hey helix":
+            case "helix":
                 _mainWindowViewModel?.OnSpeechButtonClick();
                 break;
             case "stop":
