@@ -6,7 +6,7 @@
         xmlns:md="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
         mc:Ignorable="d" d:DesignWidth="1280" d:DesignHeight="720"
         x:Class="ASWE_PDA.Views.MainWindow" Width="1280" Height="720"
-        Icon="/Assets/avalonia-logo.ico" Title="ASWE_PDA"
+        Icon="/Assets/helix.png" Title="ASWE_PDA"
         TransparencyLevelHint="AcrylicBlur"
         ExtendClientAreaToDecorationsHint="True">
 
@@ -38,11 +38,11 @@
                                 <StackPanel Orientation="Horizontal">
                                     
                                     <!-- BotIcon -->
-                                    <Image Width="40" Height="40" Margin="15,0,5,0" Source="../../Assets/avalonia-logo.ico"
+                                    <Image Width="60" Height="60" Margin="15,10,5,10" Source="../../Assets/helix.png"
                                            IsVisible="{Binding IsBotIconVisible}"/>
                                     
                                     <!-- Message -->
-                                    <TextBlock Text="{Binding MessageText}" Margin="15" TextWrapping="Wrap"/>
+                                    <TextBlock Text="{Binding MessageText}" Margin="15" VerticalAlignment="Center" TextWrapping="Wrap"/>
                                 </StackPanel>
                                 
                             </Grid>
