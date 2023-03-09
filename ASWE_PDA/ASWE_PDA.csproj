@@ -7,6 +7,9 @@
         <ApplicationManifest>app.manifest</ApplicationManifest>
         <PackageIcon>helix.png</PackageIcon>
     </PropertyGroup>
+    <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
+      <NoWarn>1701;1702;IL2121;CA1416</NoWarn>
+    </PropertyGroup>
 
     <ItemGroup>
         <AvaloniaResource Include="Assets\**" />
@@ -35,7 +38,6 @@
 
     <ItemGroup>
       <Folder Include="src\Models\ApiServices" />
-      <Folder Include="src\Models\DataService" />
     </ItemGroup>
 
     <ItemGroup>

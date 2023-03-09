@@ -1,6 +1,10 @@
-﻿using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Speech.Recognition;
+using System.Speech.Synthesis;
 using ASWE_PDA.Models.ApplicationService.DataModel;
-using ASWE_PDA.Models.SpeechService;
+using ASWE_PDA.ViewModels;
 using Avalonia.Layout;
 using Avalonia.Media;
 
@@ -9,33 +13,83 @@ namespace ASWE_PDA.Models.ApplicationService;
 public static class ApplicationService
 {
     #region Fields
+
+    public static bool IsVoiceEnabled = false;
     
     public static ObservableCollection<ChatMessage> Messages = new();
+    
+    private static readonly SpeechSynthesizer SpeechSynthesizer = new();
+    private static readonly SpeechRecognitionEngine SpeechRecognitionEngine = new();
 
-    public static ISpeechService SpeechService;
-
+    public static MainWindowViewModel? _mainWindowViewModel = null;
+    
     #endregion
     
     #region Constructors
 
     static ApplicationService()
     {
-        SpeechService = new SpeechServiceImpl();
+        AddBotMessage("Hey, how can I help you?");
+        
+        //check if design time
+        if ((LicenseManager.UsageMode == LicenseUsageMode.Designtime))
+            return;
+        
+        Init();
     }
 
     #endregion
+    
+    #region Private Methods
 
-    #region Public Methods
-
-    public static void OnStartUp()
+    private static void Init()
     {
-        AddBotMessage("Hey, how can I help you?");
+        SpeechSynthesizer.SelectVoiceByHints(VoiceGender.Female);
+        SpeechSynthesizer.Rate = 3;
+
+        var vocabulary = new Choices();
+        vocabulary.Add("hey helix", "stop", "hello");
+
+        var grammarBuilder = new GrammarBuilder();
+        grammarBuilder.Append(vocabulary);
+
+        var grammar = new Grammar(grammarBuilder);
+        
+        SpeechRecognitionEngine.LoadGrammar(grammar);
+        SpeechRecognitionEngine.SetInputToDefaultAudioDevice();
+        SpeechRecognitionEngine.RecognizeAsync(RecognizeMode.Multiple);
+
+        SpeechRecognitionEngine.SpeechRecognized += OnSpeechRecognized;
     }
 
+    private static void OnSpeechRecognized(object? sender, SpeechRecognizedEventArgs e)
+    {
+        switch (e.Result.Text.ToLower())
+        {
+            case "hey helix":
+                _mainWindowViewModel?.OnSpeechButtonClick();
+                break;
+            case "stop":
+                _mainWindowViewModel?.OnSpeechButtonClick();
+                break;
+        }
+
+        if(!IsVoiceEnabled)
+            return;
+        
+        switch (e.Result.Text.ToLower())
+        {
+            case "hello":
+                AddUserMessage("Hello!");
+                AddBotMessage("Hello, what can I do for you?");
+                break;
+        }
+    }
+    
     /// <summary>
     /// Adds a message from the bot to the main chat.
     /// </summary>
-    public static void AddBotMessage(string message)
+    private static void AddBotMessage(string message)
     {
         Messages.Add(new ChatMessage()
         {
@@ -45,13 +99,14 @@ public static class ApplicationService
             IsBotIconVisible = true
         });
         
-        SpeechService.Speak(message);
+        if ((LicenseManager.UsageMode == LicenseUsageMode.Designtime))
+            SpeechSynthesizer.SpeakAsync(message);
     }
     
     /// <summary>
     /// Adds a message from the user to the main chat.
     /// </summary>
-    public static void AddUserMessage(string message)
+    private static void AddUserMessage(string message)
     {
         Messages.Add(new ChatMessage()
         {

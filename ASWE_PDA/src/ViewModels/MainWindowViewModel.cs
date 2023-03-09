@@ -2,7 +2,6 @@
 using System.Reactive;
 using ASWE_PDA.Models.ApplicationService;
 using ASWE_PDA.Models.ApplicationService.DataModel;
-using Avalonia.Layout;
 using Avalonia.Media;
 using Material.Icons;
 using ReactiveUI;
@@ -13,11 +12,11 @@ public class MainWindowViewModel : ViewModelBase
 {
     #region Fields
 
-    private MaterialIconKind _speechButtonIcon;
-    private IBrush? _speechButtonBrush;
-    
-    #endregion
+    private static MaterialIconKind _speechButtonIcon;
+    private static IBrush? _speechButtonBrush;
 
+    #endregion
+    
     #region Properties
 
     public MaterialIconKind SpeechButtonIcon
@@ -49,22 +48,26 @@ public class MainWindowViewModel : ViewModelBase
         SpeechButtonBrush = Brushes.Red;
         
         SpeechButtonClick = ReactiveCommand.Create(OnSpeechButtonClick);
+
+        ApplicationService._mainWindowViewModel = this;
     }
 
     #endregion
 
     #region Commands
-
+    
     public ReactiveCommand<Unit, Unit> SpeechButtonClick { get; }
     
     #endregion
 
-    #region Private Methods
+    #region Public Methods
     
-    private void OnSpeechButtonClick()
+    public void OnSpeechButtonClick()
     {
         SpeechButtonIcon = SpeechButtonIcon == MaterialIconKind.Microphone ? MaterialIconKind.MicrophoneOff : MaterialIconKind.Microphone;
         SpeechButtonBrush = Equals(SpeechButtonBrush, Brushes.Green) ? Brushes.Red : Brushes.Green;
+
+        ApplicationService.IsVoiceEnabled = !ApplicationService.IsVoiceEnabled;
     }
 
     #endregion

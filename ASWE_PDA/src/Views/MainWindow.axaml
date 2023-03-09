@@ -52,6 +52,7 @@
                 </ItemsControl>
             </ScrollViewer>
             
+            <!-- Speech Button -->
             <Button Grid.Row="2" Grid.Column="1" VerticalAlignment="Center" HorizontalAlignment="Center" Width="80" Height="80" CornerRadius="20"
                     Command="{Binding SpeechButtonClick}">
                 <md:MaterialIcon Kind="{Binding SpeechButtonIcon}" Width="60" Height="60" Foreground="{Binding SpeechButtonBrush}"/>

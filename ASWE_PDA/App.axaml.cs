@@ -22,8 +22,6 @@ public partial class App : Application
             {
                 DataContext = new MainWindowViewModel()
             };
-            
-            ApplicationService.OnStartUp();
         }
 
         base.OnFrameworkInitializationCompleted();

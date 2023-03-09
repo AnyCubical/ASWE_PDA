@@ -1,4 +1,6 @@
+using ASWE_PDA.Models.ApplicationService;
 using Avalonia.Controls;
+using Avalonia.Interactivity;
 
 namespace ASWE_PDA.Views;
 
