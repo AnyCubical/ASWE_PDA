@@ -9,10 +9,6 @@
         Icon="/Assets/helix.png" Title="ASWE_PDA"
         TransparencyLevelHint="AcrylicBlur"
         ExtendClientAreaToDecorationsHint="True">
-
-    <Design.DataContext>
-        <vm:MainWindowViewModel/>
-    </Design.DataContext>
     
     <Panel Background="{x:Null}">
         

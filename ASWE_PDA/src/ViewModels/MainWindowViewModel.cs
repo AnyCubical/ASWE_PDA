@@ -38,8 +38,7 @@ public class MainWindowViewModel : ViewModelBase
     }
 
     #endregion
-    
-    
+
     #region Constructors
     
     public MainWindowViewModel()

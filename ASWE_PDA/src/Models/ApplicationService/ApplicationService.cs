@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using System.ComponentModel;
+using System.Globalization;
 using System.Speech.Recognition;
 using System.Speech.Synthesis;
+using System.Threading.Tasks;
 using ASWE_PDA.Models.ApiServices.GoldApi;
 using ASWE_PDA.Models.ApplicationService.DataModel;
 using ASWE_PDA.ViewModels;
 using Avalonia.Layout;
 using Avalonia.Media;
+using Avalonia.Threading;
 
 namespace ASWE_PDA.Models.ApplicationService;
 
@@ -30,26 +32,25 @@ public static class ApplicationService
 
     static ApplicationService()
     {
-        AddBotMessage("Hey, how can I help you?");
-        
-        //check if design time
-        if ((LicenseManager.UsageMode == LicenseUsageMode.Designtime))
-            return;
-        
         Init();
     }
 
     #endregion
     
     #region Private Methods
-
-    private static async void Init()
+    
+    /// <summary>
+    /// Initializes Application
+    /// </summary>
+    private static void Init()
     {
         SpeechSynthesizer.SelectVoiceByHints(VoiceGender.Female);
         SpeechSynthesizer.Rate = 3;
 
         var vocabulary = new Choices();
-        vocabulary.Add("helix", "stop", "hello");
+        vocabulary.Add(
+            "helix", "stop", "hello",
+            "finances");
 
         var grammarBuilder = new GrammarBuilder();
         grammarBuilder.Append(vocabulary);
@@ -61,13 +62,16 @@ public static class ApplicationService
         SpeechRecognitionEngine.RecognizeAsync(RecognizeMode.Multiple);
 
         SpeechRecognitionEngine.SpeechRecognized += OnSpeechRecognized;
-
-        var api = GoldApi.GetInstance();
-        var res = await api.GetGoldSliverPriceDollar();
+        
+        AddBotMessage("Hey, how can I help you?");
     }
 
-    private static void OnSpeechRecognized(object? sender, SpeechRecognizedEventArgs e)
+    /// <summary>
+    /// Handles Speech Recognition
+    /// </summary>
+    private static async void OnSpeechRecognized(object? sender, SpeechRecognizedEventArgs e)
     {
+        // toggle activation
         switch (e.Result.Text.ToLower())
         {
             case "helix":
@@ -75,6 +79,7 @@ public static class ApplicationService
                 break;
             case "stop":
                 _mainWindowViewModel?.OnSpeechButtonClick();
+                IsVoiceEnabled = false;
                 break;
         }
 
@@ -84,8 +89,14 @@ public static class ApplicationService
         switch (e.Result.Text.ToLower())
         {
             case "hello":
+                _mainWindowViewModel?.OnSpeechButtonClick();
                 AddUserMessage("Hello!");
-                AddBotMessage("Hello, what can I do for you?");
+                AddBotMessage("Greetings, what can I do for you?");
+                break;
+            case "finance":
+                AddUserMessage("Finance?");
+                var res = await GetFinanceReportAsync();
+                AddBotMessage(res);
                 break;
         }
     }
@@ -103,7 +114,7 @@ public static class ApplicationService
             IsBotIconVisible = true
         });
         
-        //SpeechSynthesizer.Speak(message);
+        SpeechSynthesizer.SpeakAsync(message);
     }
     
     /// <summary>
@@ -117,5 +128,28 @@ public static class ApplicationService
         });
     }
     
+    #endregion
+
+    #region Use Cases
+
+    private static async Task<string> GetFinanceReportAsync()
+    {
+        var coinPaprika = CoinPaprikaApi.GetInstance();
+        var goldApi = GoldApi.GetInstance();
+        var exchangeRateApi = ExchangeRateApi.GetInstance();
+
+        var bitcoinEthereum = await coinPaprika.GetBitcoinEthereumPriceDollar();
+        var goldSilver = await goldApi.GetGoldSliverPriceDollar();
+        var exchangeRate = await exchangeRateApi.GetUSDtoEUR();
+
+
+        var bitcoin = (bitcoinEthereum?.Item1 * exchangeRate) ?? 0;
+        var ethereum = (bitcoinEthereum?.Item2 * exchangeRate) ?? 0;
+        var gold = (goldSilver?.Item1 * exchangeRate) ?? 0;
+        var silver = (goldSilver?.Item2 * exchangeRate) ?? 0;
+    
+        return @$"Here are the current exchange rates. Bitcoin : {Math.Round(bitcoin, 2)}€ , Ethereum : {Math.Round(ethereum, 2)}€ , Gold : {Math.Round(gold, 2)}€ , Silver : {Math.Round(silver, 2)}€ ";
+    }
+
     #endregion
 }
