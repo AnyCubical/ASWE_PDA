@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Speech.Recognition;
 using System.Speech.Synthesis;
+using ASWE_PDA.Models.ApiServices.GoldApi;
 using ASWE_PDA.Models.ApplicationService.DataModel;
 using ASWE_PDA.ViewModels;
 using Avalonia.Layout;
@@ -42,7 +43,7 @@ public static class ApplicationService
     
     #region Private Methods
 
-    private static void Init()
+    private static async void Init()
     {
         SpeechSynthesizer.SelectVoiceByHints(VoiceGender.Female);
         SpeechSynthesizer.Rate = 3;
@@ -60,6 +61,9 @@ public static class ApplicationService
         SpeechRecognitionEngine.RecognizeAsync(RecognizeMode.Multiple);
 
         SpeechRecognitionEngine.SpeechRecognized += OnSpeechRecognized;
+
+        var api = GoldApi.GetInstance();
+        var res = await api.GetGoldSliverPriceDollar();
     }
 
     private static void OnSpeechRecognized(object? sender, SpeechRecognizedEventArgs e)
@@ -99,8 +103,7 @@ public static class ApplicationService
             IsBotIconVisible = true
         });
         
-        if ((LicenseManager.UsageMode == LicenseUsageMode.Designtime))
-            SpeechSynthesizer.SpeakAsync(message);
+        //SpeechSynthesizer.Speak(message);
     }
     
     /// <summary>

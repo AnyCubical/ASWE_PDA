@@ -9,6 +9,7 @@
     </PropertyGroup>
     <PropertyGroup Condition=" '$(Configuration)' == 'Debug' ">
       <NoWarn>1701;1702;IL2121;CA1416</NoWarn>
+      <WarningsAsErrors>;NU1605;SYSLIB0011;</WarningsAsErrors>
     </PropertyGroup>
 
     <ItemGroup>
@@ -28,16 +29,13 @@
         <PackageReference Include="Avalonia.ReactiveUI" Version="11.0.0-preview5" />
         <PackageReference Include="Avalonia.Themes.Fluent" Version="11.0.0-preview5" />
         <PackageReference Include="Material.Icons.Avalonia" Version="2.0.0-preview2" />
+        <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
         <PackageReference Include="System.Speech" Version="8.0.0-preview.1.23110.8" />
         <PackageReference Include="XamlNameReferenceGenerator" Version="1.5.1" />
     </ItemGroup>
 
     <ItemGroup>
       <AdditionalFiles Include="src\Views\MainWindow.axaml" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="src\Models\ApiServices" />
     </ItemGroup>
 
     <ItemGroup>
