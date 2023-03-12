@@ -1,15 +1,19 @@
 ﻿using System;
 using System.Collections.ObjectModel;
-using System.Globalization;
 using System.Speech.Recognition;
 using System.Speech.Synthesis;
 using System.Threading.Tasks;
+using ASWE_PDA.Models.ApiServices.CatFactApi;
+using ASWE_PDA.Models.ApiServices.ChuckNorrisApi;
+using ASWE_PDA.Models.ApiServices.CoinPaprikaApi;
+using ASWE_PDA.Models.ApiServices.ExchangeRateApi;
 using ASWE_PDA.Models.ApiServices.GoldApi;
+using ASWE_PDA.Models.ApiServices.WitzApi;
 using ASWE_PDA.Models.ApplicationService.DataModel;
 using ASWE_PDA.ViewModels;
 using Avalonia.Layout;
 using Avalonia.Media;
-using Avalonia.Threading;
+using Avalonia.Media.TextFormatting.Unicode;
 
 namespace ASWE_PDA.Models.ApplicationService;
 
@@ -50,7 +54,7 @@ public static class ApplicationService
         var vocabulary = new Choices();
         vocabulary.Add(
             "helix", "stop", "hello",
-            "finance");
+            "finance", "entertain", "entertainment", "joke", "chuck norris", "cat fact");
 
         var grammarBuilder = new GrammarBuilder();
         grammarBuilder.Append(vocabulary);
@@ -95,8 +99,24 @@ public static class ApplicationService
                 break;
             case "finance":
                 AddUserMessage("Finance?");
-                var res = await GetFinanceReportAsync();
-                AddBotMessage(res);
+                AddBotMessage(await GetFinanceReportAsync());
+                break;
+            case "entertain":
+            case "entertainment":
+                AddUserMessage("Entertainment?");
+                AddBotMessage(await GetEntertainmentAsync());
+                break;
+            case "joke":
+                AddUserMessage("Joke?");
+                AddBotMessage(await GetJokeAsync());
+                break;
+            case "chuck norris":
+                AddUserMessage("Chuck Norris Joke?");
+                AddBotMessage(await GetChuckNorrisJokeAsync());
+                break;
+            case "cat fact":
+                AddUserMessage("Cat fact?");
+                AddBotMessage(await GetCatFactAsync());
                 break;
         }
     }
@@ -130,17 +150,20 @@ public static class ApplicationService
     
     #endregion
 
-    #region Use Cases
-
+    #region Use Case: Finance
+    
+    /// <summary>
+    /// Returns financial results
+    /// </summary>
     private static async Task<string> GetFinanceReportAsync()
     {
         var coinPaprika = CoinPaprikaApi.GetInstance();
         var goldApi = GoldApi.GetInstance();
         var exchangeRateApi = ExchangeRateApi.GetInstance();
 
-        var bitcoinEthereumTask = coinPaprika.GetBitcoinEthereumPriceDollar();
-        var goldSilverTask = goldApi.GetGoldSliverPriceDollar();
-        var exchangeRateTask = exchangeRateApi.GetUSDtoEUR();
+        var bitcoinEthereumTask = coinPaprika.GetBitcoinEthereumPriceDollarAsync();
+        var goldSilverTask = goldApi.GetGoldSliverPriceDollarAsync();
+        var exchangeRateTask = exchangeRateApi.GetUSDtoEURAsync();
 
         await Task.WhenAll(bitcoinEthereumTask, goldSilverTask, exchangeRateTask);
         
@@ -153,7 +176,54 @@ public static class ApplicationService
         var gold = (goldSilver?.Item1 * exchangeRate) ?? 0;
         var silver = (goldSilver?.Item2 * exchangeRate) ?? 0;
     
-        return @$"Here are the current exchange rates. Bitcoin : {Math.Round(bitcoin, 2)}€ , Ethereum : {Math.Round(ethereum, 2)}€ , Gold : {Math.Round(gold, 2)}€ , Silver : {Math.Round(silver, 2)}€ ";
+        return $"Here are the current exchange rates: \n\n Bitcoin: {Math.Round(bitcoin, 2)}€ \n Ethereum: {Math.Round(ethereum, 2)}€ \n Gold: {Math.Round(gold, 2)}€ \n Silver: {Math.Round(silver, 2)}€";
+    }
+    
+    #endregion
+
+    #region Use Case: Entertainment
+    /// <summary>
+    /// Returns Entertainment results
+    /// </summary>
+    private static async Task<string> GetEntertainmentAsync()
+    {
+        var jokeTask = GetJokeAsync();
+        var cnJokeTask = GetChuckNorrisJokeAsync();
+        var catFactTask = GetCatFactAsync();
+        
+        await Task.WhenAll(jokeTask, cnJokeTask, catFactTask);
+
+        var joke = await jokeTask;
+        var cnJoke = await cnJokeTask;
+        var catFact = await catFactTask;
+
+        var result = $"{joke} \n\n {cnJoke} \n\n {catFact}";
+
+        return result;
+    }
+    
+    /// <summary>
+    /// Returns Joke
+    /// </summary>
+    private static async Task<string> GetJokeAsync()
+    {
+        return "Here is a joke: \n" + await WitzApi.GetInstance().GetJokeAsync();
+    }
+    
+    /// <summary>
+    /// Returns Chuck Norris Joke
+    /// </summary>
+    private static async Task<string> GetChuckNorrisJokeAsync()
+    {
+        return "Here is a Chuck Norris joke: \n" + await CheckNorrisApi.GetInstance().GetJokeAsync();
+    }
+    
+    /// <summary>
+    /// Returns Cat Fact
+    /// </summary>
+    private static async Task<string> GetCatFactAsync()
+    {
+        return "Here is a cat fact: \n" + await CatFactApi.GetInstance().GetCatFactAsync();
     }
 
     #endregion

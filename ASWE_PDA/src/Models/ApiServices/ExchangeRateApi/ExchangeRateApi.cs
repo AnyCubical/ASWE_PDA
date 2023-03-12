@@ -1,7 +1,7 @@
 ﻿using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 
-namespace ASWE_PDA.Models.ApiServices.GoldApi;
+namespace ASWE_PDA.Models.ApiServices.ExchangeRateApi;
 
 public class ExchangeRateApi : ApiBase
 {
@@ -22,7 +22,7 @@ public class ExchangeRateApi : ApiBase
 
     #region Public Methods
 
-    public async Task<double?> GetUSDtoEUR()
+    public async Task<double?> GetUSDtoEURAsync()
     {
         try
         {

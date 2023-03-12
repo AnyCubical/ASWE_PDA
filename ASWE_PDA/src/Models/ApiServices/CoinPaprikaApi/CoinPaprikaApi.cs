@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Text.Json.Nodes;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
-namespace ASWE_PDA.Models.ApiServices.GoldApi;
+namespace ASWE_PDA.Models.ApiServices.CoinPaprikaApi;
 
 public class CoinPaprikaApi : ApiBase
 {
@@ -25,7 +23,7 @@ public class CoinPaprikaApi : ApiBase
 
     #region Public Methods
 
-    public async Task<Tuple<double, double>?> GetBitcoinEthereumPriceDollar()
+    public async Task<Tuple<double, double>?> GetBitcoinEthereumPriceDollarAsync()
     {
         try
         {

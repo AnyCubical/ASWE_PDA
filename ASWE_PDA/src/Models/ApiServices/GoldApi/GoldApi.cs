@@ -25,7 +25,7 @@ public class GoldApi : ApiBase
 
     #region Public Methods
 
-    public async Task<Tuple<double, double>?> GetGoldSliverPriceDollar()
+    public async Task<Tuple<double, double>?> GetGoldSliverPriceDollarAsync()
     {
         var response = await MakeHttpRequest(
             "https://www.goldapi.io/api/XAU/USD",
