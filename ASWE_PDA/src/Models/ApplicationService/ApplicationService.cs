@@ -50,7 +50,7 @@ public static class ApplicationService
         var vocabulary = new Choices();
         vocabulary.Add(
             "helix", "stop", "hello",
-            "finances");
+            "finance");
 
         var grammarBuilder = new GrammarBuilder();
         grammarBuilder.Append(vocabulary);
@@ -138,10 +138,15 @@ public static class ApplicationService
         var goldApi = GoldApi.GetInstance();
         var exchangeRateApi = ExchangeRateApi.GetInstance();
 
-        var bitcoinEthereum = await coinPaprika.GetBitcoinEthereumPriceDollar();
-        var goldSilver = await goldApi.GetGoldSliverPriceDollar();
-        var exchangeRate = await exchangeRateApi.GetUSDtoEUR();
+        var bitcoinEthereumTask = coinPaprika.GetBitcoinEthereumPriceDollar();
+        var goldSilverTask = goldApi.GetGoldSliverPriceDollar();
+        var exchangeRateTask = exchangeRateApi.GetUSDtoEUR();
 
+        await Task.WhenAll(bitcoinEthereumTask, goldSilverTask, exchangeRateTask);
+        
+        var bitcoinEthereum = await bitcoinEthereumTask;
+        var goldSilver = await goldSilverTask;
+        var exchangeRate = await exchangeRateTask;
 
         var bitcoin = (bitcoinEthereum?.Item1 * exchangeRate) ?? 0;
         var ethereum = (bitcoinEthereum?.Item2 * exchangeRate) ?? 0;
