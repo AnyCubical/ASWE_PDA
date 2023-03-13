@@ -1,19 +1,21 @@
 ﻿using System;
 using System.Collections.ObjectModel;
+using System.Diagnostics;
 using System.Speech.Recognition;
 using System.Speech.Synthesis;
 using System.Threading.Tasks;
 using ASWE_PDA.Models.ApiServices.CatFactApi;
 using ASWE_PDA.Models.ApiServices.ChuckNorrisApi;
 using ASWE_PDA.Models.ApiServices.CoinPaprikaApi;
+using ASWE_PDA.Models.ApiServices.ErgastApi;
 using ASWE_PDA.Models.ApiServices.ExchangeRateApi;
 using ASWE_PDA.Models.ApiServices.GoldApi;
+using ASWE_PDA.Models.ApiServices.OpenLigaDB;
 using ASWE_PDA.Models.ApiServices.WitzApi;
 using ASWE_PDA.Models.ApplicationService.DataModel;
 using ASWE_PDA.ViewModels;
 using Avalonia.Layout;
 using Avalonia.Media;
-using Avalonia.Media.TextFormatting.Unicode;
 
 namespace ASWE_PDA.Models.ApplicationService;
 
@@ -54,7 +56,9 @@ public static class ApplicationService
         var vocabulary = new Choices();
         vocabulary.Add(
             "helix", "stop", "hello",
-            "finance", "entertain", "entertainment", "joke", "chuck norris", "cat fact");
+            "finance", 
+            "entertain", "entertainment", "joke", "chuck norris", "cat fact", 
+            "sport", "football", "bundesliga", "formula one");
 
         var grammarBuilder = new GrammarBuilder();
         grammarBuilder.Append(vocabulary);
@@ -65,7 +69,7 @@ public static class ApplicationService
         SpeechRecognitionEngine.SetInputToDefaultAudioDevice();
         SpeechRecognitionEngine.RecognizeAsync(RecognizeMode.Multiple);
 
-        SpeechRecognitionEngine.SpeechRecognized += OnSpeechRecognized;
+        SpeechRecognitionEngine.SpeechRecognized += OnSpeechRecognizedAsync;
         
         AddBotMessage("Hey, how can I help you?");
     }
@@ -73,7 +77,7 @@ public static class ApplicationService
     /// <summary>
     /// Handles Speech Recognition
     /// </summary>
-    private static async void OnSpeechRecognized(object? sender, SpeechRecognizedEventArgs e)
+    private static async void OnSpeechRecognizedAsync(object? sender, SpeechRecognizedEventArgs e)
     {
         // toggle activation
         switch (e.Result.Text.ToLower())
@@ -117,6 +121,24 @@ public static class ApplicationService
             case "cat fact":
                 AddUserMessage("Cat fact?");
                 AddBotMessage(await GetCatFactAsync());
+                break;
+            case "sport":
+                AddUserMessage("Sports?");
+                AddBotMessage(await GetSportsAsync());
+                ShowFootballTable();
+                break;
+            case "football":
+                AddUserMessage("Football?");
+                AddBotMessage(await GetLeadingFootballTeamsAsync());
+                break;
+            case "bundesliga":
+                AddUserMessage("Football?");
+                AddBotMessage("Here is the Bundesliga table");
+                ShowFootballTable();
+                break;
+            case "formula one":
+                AddUserMessage("F1?");
+                AddBotMessage("Here are the leading F1 drivers: " + await GetLeadingF1Async());
                 break;
         }
     }
@@ -224,6 +246,56 @@ public static class ApplicationService
     private static async Task<string> GetCatFactAsync()
     {
         return "Here is a cat fact: \n" + await CatFactApi.GetInstance().GetCatFactAsync();
+    }
+
+    #endregion
+
+    #region Use Case: Sports
+
+    /// <summary>
+    /// Returns Sport results
+    /// </summary>
+    private static async Task<string> GetSportsAsync()
+    {
+        var footballTask = GetLeadingFootballTeamsAsync();
+        var f1Task = GetLeadingF1Async();
+
+        await Task.WhenAll(footballTask, f1Task);
+
+        var football = await footballTask;
+        var f1 = await f1Task;
+
+        var result = $"{football} \n\n {f1}";
+
+        return result;
+    }
+    
+    /// <summary>
+    /// Return leading football teams
+    /// </summary>
+    private static async Task<string> GetLeadingFootballTeamsAsync()
+    {
+        return "Here are the leading teams: \n" + await OpenLigaDbApi.GetInstance().GetLeadingTeamsAsync();
+    }
+    
+    /// <summary>
+    /// Show leading football teams
+    /// </summary>
+    private static void ShowFootballTable()
+    {
+        Process.Start(new ProcessStartInfo
+        {
+            FileName = "https://www.bundesliga.com/de/bundesliga/tabelle",
+            UseShellExecute = true
+        });
+    }
+    
+    /// <summary>
+    /// Show leading F1 drivers
+    /// </summary>
+    private static async Task<string>  GetLeadingF1Async()
+    {
+        return "Here are the leading drivers: \n" + await ErgastApi.GetInstance().GetLatestF1ResultsAsync();
     }
 
     #endregion
