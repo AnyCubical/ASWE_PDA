@@ -34,7 +34,7 @@ public class ErgastApi : ApiBase
 
         var doc = XDocument.Parse(response);
 
-        const string ns = "http://ergast.com/mrd/1.5";
+        XNamespace ns = "http://ergast.com/mrd/1.5";
         var top3 = doc.Descendants(ns + "RaceTable")
             .Elements(ns + "Race")
             .Elements(ns + "ResultsList")
