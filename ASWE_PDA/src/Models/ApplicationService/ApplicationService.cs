@@ -132,7 +132,7 @@ public static class ApplicationService
                 AddBotMessage(await GetLeadingFootballTeamsAsync());
                 break;
             case "bundesliga":
-                AddUserMessage("Football?");
+                AddUserMessage("Bundesliga?");
                 AddBotMessage("Here is the Bundesliga table");
                 ShowFootballTable();
                 break;
