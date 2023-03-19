@@ -24,17 +24,24 @@ public class CheckNorrisApi : ApiBase
 
     public async Task<string?> GetJokeAsync()
     {
-        var response = await MakeHttpRequest(
-            "https://api.chucknorris.io/jokes/random"
-        );
+        try
+        {
+            var response = await MakeHttpRequest(
+                "https://api.chucknorris.io/jokes/random"
+            );
 
-        if (response == null)
-            return null;
+            if (response == null)
+                return null;
         
-        var json = JObject.Parse(response)!;
-        var res = (string)json["value"]!;
+            var json = JObject.Parse(response)!;
+            var res = (string)json["value"]!;
 
-        return res;
+            return res;
+        }
+        catch
+        {
+            return null;
+        }
     }
     
     public static CheckNorrisApi GetInstance()

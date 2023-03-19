@@ -27,31 +27,38 @@ public class GoldApi : ApiBase
 
     public async Task<Tuple<double, double>?> GetGoldSliverPriceDollarAsync()
     {
-        var response = await MakeHttpRequest(
-            "https://www.goldapi.io/api/XAU/USD",
-            Token,
-            TokenValue
+        try
+        {
+            var response = await MakeHttpRequest(
+                "https://www.goldapi.io/api/XAU/USD",
+                Token,
+                TokenValue
             );
 
-        if (response == null)
-            return null;
+            if (response == null)
+                return null;
         
-        var json = JsonNode.Parse(response);
-        var gold = (double)(json?["price"] ?? 0);
+            var json = JsonNode.Parse(response);
+            var gold = (double)(json?["price"] ?? 0);
         
-        response = await MakeHttpRequest(
-            "https://www.goldapi.io/api/XAG/USD",
-            Token,
-            TokenValue
-        );
+            response = await MakeHttpRequest(
+                "https://www.goldapi.io/api/XAG/USD",
+                Token,
+                TokenValue
+            );
 
-        if (response == null)
-            return null;
+            if (response == null)
+                return null;
         
-        json = JsonNode.Parse(response);
-        var silver = (double)(json?["price"] ?? 0);
+            json = JsonNode.Parse(response);
+            var silver = (double)(json?["price"] ?? 0);
         
-        return new Tuple<double, double>(gold, silver);
+            return new Tuple<double, double>(gold, silver);
+        }
+        catch
+        {
+            return new Tuple<double, double>(0, 0);
+        }
     }
     
     public static GoldApi GetInstance()

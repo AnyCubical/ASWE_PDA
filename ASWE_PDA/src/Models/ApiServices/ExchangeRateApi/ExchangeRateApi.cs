@@ -42,8 +42,6 @@ public class ExchangeRateApi : ApiBase
         {
             return null;
         }
-        
-        return null;
     }
     
     public static ExchangeRateApi GetInstance()

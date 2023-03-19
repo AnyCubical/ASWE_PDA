@@ -25,26 +25,34 @@ public class ErgastApi : ApiBase
 
     public async Task<string?> GetLatestF1ResultsAsync()
     {
-        var response = await MakeHttpRequest(
-            "https://ergast.com/api/f1/current/last/results"
-        );
+        try
+        {
+            var response = await MakeHttpRequest(
+                "https://ergast.com/api/f1/current/last/results"
+            );
 
-        if (string.IsNullOrEmpty(response))
+            if (string.IsNullOrEmpty(response))
+                return null;
+
+            var doc = XDocument.Parse(response);
+
+            XNamespace ns = "http://ergast.com/mrd/1.5";
+            var top3 = doc.Descendants(ns + "RaceTable")
+                .Elements(ns + "Race")
+                .Elements(ns + "ResultsList")
+                .Elements(ns + "Result")
+                .OrderBy(r => int.Parse(r.Attribute("position")?.Value!))
+                .Take(3)
+                .Select(r => r.Element(ns + "Driver")?.Element(ns + "GivenName")?.Value + " " +
+                             r.Element(ns + "Driver")?.Element(ns + "FamilyName")?.Value);
+
+            return top3.Aggregate("", (current, driver) => current + $"{driver}\n");
+        }
+        catch
+        {
             return null;
-
-        var doc = XDocument.Parse(response);
-
-        XNamespace ns = "http://ergast.com/mrd/1.5";
-        var top3 = doc.Descendants(ns + "RaceTable")
-            .Elements(ns + "Race")
-            .Elements(ns + "ResultsList")
-            .Elements(ns + "Result")
-            .OrderBy(r => int.Parse(r.Attribute("position")?.Value!))
-            .Take(3)
-            .Select(r => r.Element(ns + "Driver")?.Element(ns + "GivenName")?.Value + " " +
-                         r.Element(ns + "Driver")?.Element(ns + "FamilyName")?.Value);
+        }
         
-        return top3.Aggregate("", (current, driver) => current + $"{driver}\n");
     }
     
     public static ErgastApi GetInstance()

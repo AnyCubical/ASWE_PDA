@@ -1,4 +1,5 @@
-﻿using System.Threading.Tasks;
+﻿using System;
+using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 
 namespace ASWE_PDA.Models.ApiServices.WitzApi;
@@ -24,17 +25,24 @@ public class WitzApi : ApiBase
 
     public async Task<string?> GetJokeAsync()
     {
-        var response = await MakeHttpRequest(
-            "https://witzapi.de/api/joke/?limit=1&language=de"
-        );
+        try
+        {
+            var response = await MakeHttpRequest(
+                "https://witzapi.de/api/joke/?limit=1&language=de"
+            );
 
-        if (response == null)
-            return null;
+            if (response == null)
+                return null;
         
-        var json = JArray.Parse(response)!;
-        var res = (string)json[0]["text"]!;
+            var json = JArray.Parse(response)!;
+            var res = (string)json[0]["text"]!;
 
-        return res;
+            return res;
+        }
+        catch
+        {
+            return null;
+        }
     }
     
     public static WitzApi GetInstance()
