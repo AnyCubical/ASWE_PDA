@@ -3,6 +3,7 @@ using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Speech.Recognition;
 using System.Speech.Synthesis;
+using System.Threading;
 using System.Threading.Tasks;
 using ASWE_PDA.Models.ApiServices.CatFactApi;
 using ASWE_PDA.Models.ApiServices.ChuckNorrisApi;
@@ -16,6 +17,7 @@ using ASWE_PDA.Models.ApplicationService.DataModel;
 using ASWE_PDA.ViewModels;
 using Avalonia.Layout;
 using Avalonia.Media;
+using Avalonia.Threading;
 
 namespace ASWE_PDA.Models.ApplicationService;
 
@@ -27,9 +29,12 @@ public static class ApplicationService
     
     public static ObservableCollection<ChatMessage> Messages = new();
     
+    private static Timer? _timerFinance;
+    private static Timer? _timerSports;
+    
     private static readonly SpeechSynthesizer SpeechSynthesizer = new();
     private static readonly SpeechRecognitionEngine SpeechRecognitionEngine = new();
-
+    
     public static MainWindowViewModel? _mainWindowViewModel = null;
     
     #endregion
@@ -71,6 +76,9 @@ public static class ApplicationService
 
         SpeechRecognitionEngine.SpeechRecognized += OnSpeechRecognizedAsync;
         
+        _timerFinance = new Timer(OnFinanceTimerElapsed, null, DateTime.Today.Add(new TimeSpan(21, 0, 0)) - DateTime.Now, TimeSpan.FromDays(1));
+        _timerSports = new Timer(OnSportsTimerElapsed, null, DateTime.Today.Add(new TimeSpan(18, 0, 0)) - DateTime.Now, TimeSpan.FromDays(7));
+
         AddBotMessage("Hey, how can I help you?");
     }
 
@@ -167,6 +175,24 @@ public static class ApplicationService
         Messages.Add(new ChatMessage()
         {
             MessageText = message
+        });
+    }
+
+    private static void OnFinanceTimerElapsed(object? state)
+    {
+        Dispatcher.UIThread.Post(async () =>
+        {
+            AddBotMessage("Hey it's 21:00! Here is your daily financial update. ");
+            AddBotMessage(await GetFinanceReportAsync());
+        });
+    }
+    
+    private static void OnSportsTimerElapsed(object? state)
+    {
+        Dispatcher.UIThread.Post(async () =>
+        {
+            AddBotMessage("Hey it's Sunday 18:00! Here is your weekly sports update. ");
+            AddBotMessage(await GetSportsAsync());
         });
     }
     

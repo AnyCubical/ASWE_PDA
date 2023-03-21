@@ -1,4 +1,3 @@
-using ASWE_PDA.Models.ApplicationService;
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;

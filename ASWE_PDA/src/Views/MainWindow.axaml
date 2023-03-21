@@ -3,8 +3,9 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:md="clr-namespace:Material.Icons.Avalonia;assembly=Material.Icons.Avalonia"
+        x:Class="ASWE_PDA.Views.MainWindow"
         mc:Ignorable="d" d:DesignWidth="1280" d:DesignHeight="720"
-        x:Class="ASWE_PDA.Views.MainWindow" Width="1280" Height="720"
+        Width="1280" Height="720"
         Icon="/Assets/helix.png" Title="ASWE_PDA"
         TransparencyLevelHint="AcrylicBlur"
         ExtendClientAreaToDecorationsHint="True">
@@ -38,6 +39,7 @@
                                     
                                     <!-- Message -->
                                     <TextBlock Text="{Binding MessageText}" Margin="15" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                                    
                                 </StackPanel>
                                 
                             </Grid>
