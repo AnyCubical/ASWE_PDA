@@ -3,17 +3,17 @@ using Newtonsoft.Json.Linq;
 
 namespace ASWE_PDA.Models.ApiServices.ChuckNorrisApi;
 
-public class CheckNorrisApi : ApiBase
+public class ChuckNorrisApi : ApiBase
 {
     #region Fields
 
-    private static readonly CheckNorrisApi? _instance = null;
+    private static readonly ChuckNorrisApi? _instance = null;
 
     #endregion
 
     #region Constructors
 
-    private CheckNorrisApi()
+    private ChuckNorrisApi()
     {
         
     }
@@ -44,9 +44,9 @@ public class CheckNorrisApi : ApiBase
         }
     }
     
-    public static CheckNorrisApi GetInstance()
+    public static ChuckNorrisApi GetInstance()
     {
-        return _instance ?? new CheckNorrisApi();
+        return _instance ?? new ChuckNorrisApi();
     }
     
     #endregion

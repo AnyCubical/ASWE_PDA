@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Reflection;
 using System.Speech.Recognition;
 using System.Speech.Synthesis;
 using System.Threading;
@@ -76,8 +77,8 @@ public static class ApplicationService
 
         SpeechRecognitionEngine.SpeechRecognized += OnSpeechRecognizedAsync;
         
-        _timerFinance = new Timer(OnFinanceTimerElapsed, null, DateTime.Today.Add(new TimeSpan(21, 0, 0)) - DateTime.Now, TimeSpan.FromDays(1));
-        _timerSports = new Timer(OnSportsTimerElapsed, null, DateTime.Today.Add(new TimeSpan(18, 0, 0)) - DateTime.Now, TimeSpan.FromDays(7));
+        _timerFinance = new Timer(OnFinanceTimerElapsed, null, DateTime.Today.Add(new TimeSpan(22, 0, 0)) - DateTime.Now, TimeSpan.FromDays(1));
+        _timerSports = new Timer(OnSportsTimerElapsed, null, DateTime.Today.Add(new TimeSpan(21, 0, 0)) - DateTime.Now, TimeSpan.FromDays(7));
 
         AddBotMessage("Hey, how can I help you?");
     }
@@ -163,7 +164,7 @@ public static class ApplicationService
             MessageBackground = new SolidColorBrush(Color.FromRgb(123, 120, 121)),
             IsBotIconVisible = true
         });
-        
+
         SpeechSynthesizer.SpeakAsync(message);
     }
     
@@ -263,7 +264,7 @@ public static class ApplicationService
     /// </summary>
     private static async Task<string> GetChuckNorrisJokeAsync()
     {
-        return "Here is a Chuck Norris joke: \n" + await CheckNorrisApi.GetInstance().GetJokeAsync();
+        return "Here is a Chuck Norris joke: \n" + await ChuckNorrisApi.GetInstance().GetJokeAsync();
     }
     
     /// <summary>
