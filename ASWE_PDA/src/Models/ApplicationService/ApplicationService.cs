@@ -13,6 +13,7 @@ using ASWE_PDA.Models.ApiServices.CoinPaprikaApi;
 using ASWE_PDA.Models.ApiServices.ErgastApi;
 using ASWE_PDA.Models.ApiServices.ExchangeRateApi;
 using ASWE_PDA.Models.ApiServices.GoldApi;
+using ASWE_PDA.Models.ApiServices.GoogleCalendarApi;
 using ASWE_PDA.Models.ApiServices.OpenLigaDB;
 using ASWE_PDA.Models.ApiServices.WeatherStationApi;
 using ASWE_PDA.Models.ApiServices.WitzApi;
@@ -363,13 +364,15 @@ public static class ApplicationService
     {
         var activityTask = GetActivityAsync();
         var weatherTask = GetWeatherAsync();
+        var meetingsTask = GetMeetingsAsync();
 
-        await Task.WhenAll(activityTask, weatherTask);
+        await Task.WhenAll(activityTask, weatherTask, meetingsTask);
 
         var activity = await activityTask;
         var weather = await weatherTask;
+        var meetings = await meetingsTask;
 
-        var result = $"{activity} \n\n {weather}";
+        var result = $"{activity} \n\n {weather} \n\n {meetings}";
 
         return result;
     }
@@ -388,6 +391,14 @@ public static class ApplicationService
     private static async Task<string> GetWeatherAsync()
     {
         return "Your daily weather forecast: \n" + await WeatherStationApi.GetInstance().GetWeatherAsync();
+    }
+    
+    /// <summary>
+    /// Returns the calendar meetings
+    /// </summary>
+    private static async Task<string> GetMeetingsAsync()
+    {
+        return "Your meetings: \n" + await GoogleCalendarApi.GetInstance().GetMeetingsAsync();
     }
 
     #endregion
