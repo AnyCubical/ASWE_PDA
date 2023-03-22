@@ -37,7 +37,7 @@ public class WeatherStationApi : ApiBase
             
             var json = JObject.Parse(response)!;
             
-            var temperatureToken = json["10738"]?["forecast1"]?["temperature"];
+            var temperatureToken = json["10738"]?["forecast1"]?["temperatureStd"];
             var temperatureData = temperatureToken?.ToObject<int[]>();
             
             var precipitationToken = json["10738"]?["forecast1"]?["precipitationTotal"];
@@ -64,7 +64,7 @@ public class WeatherStationApi : ApiBase
                 maxPerc = perc > maxPerc ? perc : maxPerc;
             }
 
-            var res = $"Min Temp: {minTemp}°F , Max Temp: {maxTemp}°F, Min Precipitation {minPerc}, Max Precipitation {maxPerc}";
+            var res = $"Min Temp: {minTemp}°F , Max Temp: {maxTemp}°F, Min Precipitation {minPerc / 32767}%, Max Precipitation {maxPerc/32767}%";
 
             return res;
         }
