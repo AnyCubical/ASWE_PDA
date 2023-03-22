@@ -3,7 +3,7 @@ using ASWE_PDA.Models.ApplicationService;
 
 namespace ASWE_PDA_Test;
 
-public class ApplicationTests
+public class UseCaseTests
 {
     [Fact]
     public async void FinanceReportTest()
@@ -15,6 +15,7 @@ public class ApplicationTests
         var result = await task;
         
         Assert.NotNull(result);
+        Assert.IsType<string>(result);
     }
     
     [Fact]
@@ -27,6 +28,7 @@ public class ApplicationTests
         var result = await task;
         
         Assert.NotNull(result);
+        Assert.IsType<string>(result);
     }
     
     [Fact]
@@ -39,5 +41,19 @@ public class ApplicationTests
         var result = await task;
         
         Assert.NotNull(result);
+        Assert.IsType<string>(result);
+    }
+    
+    [Fact]
+    public async void GoodMorningTest()
+    {
+        var methodInfo = typeof(ApplicationService)
+            .GetMethod("GetGoodMorningAsync", BindingFlags.NonPublic | BindingFlags.Static);
+
+        var task = (Task<string>)methodInfo?.Invoke(null, null)!;
+        var result = await task;
+        
+        Assert.NotNull(result);
+        Assert.IsType<string>(result);
     }
 }

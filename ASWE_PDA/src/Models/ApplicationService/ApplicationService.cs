@@ -6,6 +6,7 @@ using System.Speech.Recognition;
 using System.Speech.Synthesis;
 using System.Threading;
 using System.Threading.Tasks;
+using ASWE_PDA.Models.ApiServices.BoredApi;
 using ASWE_PDA.Models.ApiServices.CatFactApi;
 using ASWE_PDA.Models.ApiServices.ChuckNorrisApi;
 using ASWE_PDA.Models.ApiServices.CoinPaprikaApi;
@@ -13,6 +14,7 @@ using ASWE_PDA.Models.ApiServices.ErgastApi;
 using ASWE_PDA.Models.ApiServices.ExchangeRateApi;
 using ASWE_PDA.Models.ApiServices.GoldApi;
 using ASWE_PDA.Models.ApiServices.OpenLigaDB;
+using ASWE_PDA.Models.ApiServices.WeatherStationApi;
 using ASWE_PDA.Models.ApiServices.WitzApi;
 using ASWE_PDA.Models.ApplicationService.DataModel;
 using ASWE_PDA.ViewModels;
@@ -32,6 +34,7 @@ public static class ApplicationService
     
     private static Timer? _timerFinance;
     private static Timer? _timerSports;
+    private static Timer? _timerGoodMorning;
     
     private static readonly SpeechSynthesizer SpeechSynthesizer = new();
     private static readonly SpeechRecognitionEngine SpeechRecognitionEngine = new();
@@ -64,7 +67,8 @@ public static class ApplicationService
             "helix", "stop", "hello",
             "finance", 
             "entertain", "entertainment", "joke", "chuck norris", "cat fact", 
-            "sport", "football", "bundesliga", "formula one");
+            "sport", "football", "bundesliga", "formula one",
+            "good morning", "activity", "weather");
 
         var grammarBuilder = new GrammarBuilder();
         grammarBuilder.Append(vocabulary);
@@ -77,8 +81,10 @@ public static class ApplicationService
 
         SpeechRecognitionEngine.SpeechRecognized += OnSpeechRecognizedAsync;
         
-        _timerFinance = new Timer(OnFinanceTimerElapsed, null, DateTime.Today.Add(new TimeSpan(22, 0, 0)) - DateTime.Now, TimeSpan.FromDays(1));
-        _timerSports = new Timer(OnSportsTimerElapsed, null, DateTime.Today.Add(new TimeSpan(21, 0, 0)) - DateTime.Now, TimeSpan.FromDays(7));
+        // events start the next day
+        _timerFinance = new Timer(OnFinanceTimerElapsed, null, DateTime.Today.Add(new TimeSpan(22 + 24, 0, 0)) - DateTime.Now, TimeSpan.FromDays(1));
+        _timerSports = new Timer(OnSportsTimerElapsed, null, DateTime.Today.Add(new TimeSpan(21 + 24, 0, 0)) - DateTime.Now, TimeSpan.FromDays(7));
+        _timerGoodMorning = new Timer(OnGoodMorningTimerElapsed, null, DateTime.Today.Add(new TimeSpan(6 + 24, 0, 0)) - DateTime.Now, TimeSpan.FromDays(1));
 
         AddBotMessage("Hey, how can I help you?");
     }
@@ -149,6 +155,18 @@ public static class ApplicationService
                 AddUserMessage("F1?");
                 AddBotMessage("Here are the leading F1 drivers: " + await GetLeadingF1Async());
                 break;
+            case "good morning":
+                AddUserMessage("Good morning!");
+                AddBotMessage(await GetGoodMorningAsync());
+                break;
+            case "activity":
+                AddUserMessage("Activity?");
+                AddBotMessage(await GetActivityAsync());
+                break;
+            case "weather":
+                AddUserMessage("Weather?");
+                AddBotMessage(await GetWeatherAsync());
+                break;
         }
     }
     
@@ -194,6 +212,15 @@ public static class ApplicationService
         {
             AddBotMessage("Hey it's Sunday 18:00! Here is your weekly sports update. ");
             AddBotMessage(await GetSportsAsync());
+        });
+    }
+    
+    private static void OnGoodMorningTimerElapsed(object? state)
+    {
+        Dispatcher.UIThread.Post(async () =>
+        {
+            AddBotMessage("Hey it's 6:00! Here is your daily update. ");
+            AddBotMessage(await GetGoodMorningAsync());
         });
     }
     
@@ -323,6 +350,44 @@ public static class ApplicationService
     private static async Task<string>  GetLeadingF1Async()
     {
         return "Here are the leading drivers: \n" + await ErgastApi.GetInstance().GetLatestF1ResultsAsync();
+    }
+
+    #endregion
+
+    #region Use Case: Good Morning
+    
+    /// <summary>
+    /// Returns good morning information results
+    /// </summary>
+    private static async Task<string> GetGoodMorningAsync()
+    {
+        var activityTask = GetActivityAsync();
+        var weatherTask = GetWeatherAsync();
+
+        await Task.WhenAll(activityTask, weatherTask);
+
+        var activity = await activityTask;
+        var weather = await weatherTask;
+
+        var result = $"{activity} \n\n {weather}";
+
+        return result;
+    }
+    
+    /// <summary>
+    /// Returns a random acitvity
+    /// </summary>
+    private static async Task<string> GetActivityAsync()
+    {
+        return "Here is an activity for today:  \n" + await BoredApi.GetInstance().GetActivityAsync();
+    }
+    
+    /// <summary>
+    /// Returns the weather
+    /// </summary>
+    private static async Task<string> GetWeatherAsync()
+    {
+        return "Your daily weather forecast: \n" + await WeatherStationApi.GetInstance().GetWeatherAsync();
     }
 
     #endregion

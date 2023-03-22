@@ -1,3 +1,4 @@
+using ASWE_PDA.Models.ApiServices.BoredApi;
 using ASWE_PDA.Models.ApiServices.CatFactApi;
 using ASWE_PDA.Models.ApiServices.ChuckNorrisApi;
 using ASWE_PDA.Models.ApiServices.CoinPaprikaApi;
@@ -5,6 +6,7 @@ using ASWE_PDA.Models.ApiServices.ErgastApi;
 using ASWE_PDA.Models.ApiServices.ExchangeRateApi;
 using ASWE_PDA.Models.ApiServices.GoldApi;
 using ASWE_PDA.Models.ApiServices.OpenLigaDB;
+using ASWE_PDA.Models.ApiServices.WeatherStationApi;
 using ASWE_PDA.Models.ApiServices.WitzApi;
 
 namespace ASWE_PDA_Test;
@@ -86,6 +88,25 @@ public class ApiTests
     {
         var api = WitzApi.GetInstance();
         var result = await api.GetJokeAsync();
+
+        Assert.NotNull(result); 
+        Assert.IsType<string>(result);
+    }
+    
+    [Fact]
+    public async void BoredApiTest()
+    {
+        var api = BoredApi.GetInstance();
+        var result = await api.GetActivityAsync();
+
+        Assert.NotNull(result); 
+        Assert.IsType<string>(result);
+    }
+    
+    public async void WeatherApiTest()
+    {
+        var api = WeatherStationApi.GetInstance();
+        var result = await api.GetWeatherAsync();
 
         Assert.NotNull(result); 
         Assert.IsType<string>(result);
