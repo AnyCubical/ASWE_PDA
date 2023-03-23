@@ -64,7 +64,7 @@ public class WeatherStationApi : ApiBase
                 maxPerc = perc > maxPerc ? perc : maxPerc;
             }
 
-            var res = $"Min Temp: {minTemp}°F , Max Temp: {maxTemp}°F, Min Precipitation {minPerc / 32767}%, Max Precipitation {maxPerc/32767}%";
+            var res = $"Min Temp: {minTemp / 10}°F , Max Temp: {maxTemp / 10}°F, Min Precipitation {minPerc / 32767}%, Max Precipitation {maxPerc/32767}%";
 
             return res;
         }
