@@ -37,34 +37,16 @@ public class WeatherStationApi : ApiBase
             
             var json = JObject.Parse(response)!;
             
-            var temperatureToken = json["10738"]?["forecast1"]?["temperatureStd"];
-            var temperatureData = temperatureToken?.ToObject<int[]>();
-            
-            var precipitationToken = json["10738"]?["forecast1"]?["precipitationTotal"];
-            var precipitationData = precipitationToken?.ToObject<int[]>();
+            var temperatureToken = json["10738"]?["days"];
+            //var temperatureData = temperatureToken?.ToObject<String[]>();
 
-            var minTemp = double.MaxValue;
-            var maxTemp = double.MinValue;
-            
-            foreach (var temp in temperatureData!)
-            {
-                if(temp is < -200 or > 150)
-                    continue;
-                    
-                minTemp = temp < minTemp ? temp : minTemp;
-                maxTemp = temp > maxTemp ? temp : maxTemp;
-            }
-            
-            var minPerc = double.MaxValue;
-            var maxPerc = double.MinValue;
-            
-            foreach (var perc in precipitationData!)
-            {
-                minPerc = perc < minPerc ? perc : minPerc;
-                maxPerc = perc > maxPerc ? perc : maxPerc;
-            }
+            double minTemp = (double)temperatureToken[0]["temperatureMin"];
+            double maxTemp = (double)temperatureToken[0]["temperatureMax"];
+            double minTempTomorrow = (double)temperatureToken[1]["temperatureMin"];
+            double maxTempTomorrow = (double)temperatureToken[1]["temperatureMax"];
 
-            var res = $"Min Temp: {minTemp / 10}°F , Max Temp: {maxTemp / 10}°F, Min Precipitation {minPerc / 32767}%, Max Precipitation {maxPerc/32767}%";
+
+            var res = $"Min Temp: {minTemp / 10}°C , Max Temp: {maxTemp / 10}°C, Tomorrows Temperature: Min Temp: {minTempTomorrow / 10}°C, Max Temp: {maxTempTomorrow/10}°C";
 
             return res;
         }
