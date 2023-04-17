@@ -1,9 +1,12 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.Reflection;
 using System.Speech.Recognition;
 using System.Speech.Synthesis;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using ASWE_PDA.Models.ApiServices.BoredApi;
@@ -14,6 +17,7 @@ using ASWE_PDA.Models.ApiServices.ErgastApi;
 using ASWE_PDA.Models.ApiServices.ExchangeRateApi;
 using ASWE_PDA.Models.ApiServices.GoldApi;
 using ASWE_PDA.Models.ApiServices.GoogleCalendarApi;
+using ASWE_PDA.Models.ApiServices.InteractivityApi;
 using ASWE_PDA.Models.ApiServices.OpenLigaDB;
 using ASWE_PDA.Models.ApiServices.WeatherStationApi;
 using ASWE_PDA.Models.ApiServices.WitzApi;
@@ -22,12 +26,18 @@ using ASWE_PDA.ViewModels;
 using Avalonia.Layout;
 using Avalonia.Media;
 using Avalonia.Threading;
+using Pv;
 
 namespace ASWE_PDA.Models.ApplicationService;
 
 public static class ApplicationService
 {
     #region Fields
+
+    private static Cheetah cheetah;
+    private static PvRecorder recorder;
+
+    
 
     public static bool IsVoiceEnabled = false;
     
@@ -38,7 +48,9 @@ public static class ApplicationService
     private static Timer? _timerGoodMorning;
     
     private static readonly SpeechSynthesizer SpeechSynthesizer = new();
-    private static readonly SpeechRecognitionEngine SpeechRecognitionEngine = new();
+    private static readonly SpeechSynthesizer SpeechSynthesizerGer = new();
+
+    private static readonly SpeechRecognitionEngine SpeechRecognitionEngine = new SpeechRecognitionEngine(new System.Globalization.CultureInfo("en-GB"));
     
     public static MainWindowViewModel? _mainWindowViewModel = null;
     
@@ -54,33 +66,90 @@ public static class ApplicationService
     #endregion
     
     #region Private Methods
+
+    private static void ProcessCheetahFrame(short[] pcm)
+{
+    if (cheetah == null)
+    {
+        return;
+    }
+
+    CheetahTranscript transcriptObj = cheetah.Process(pcm);
+    if (!string.IsNullOrEmpty(transcriptObj.Transcript))
+    {
+        // Handle the partial transcript
+        Console.Write(transcriptObj.Transcript);
+    }
+    if (transcriptObj.IsEndpoint)
+    {
+        // Handle the final transcript
+        CheetahTranscript finalTranscriptObj = cheetah.Flush();
+        Console.WriteLine(finalTranscriptObj.Transcript);
+    }
+}
+    private static async Task ProcessAudio()
+    {
+        try
+        {
+            StringBuilder transcriptBuilder = new StringBuilder();
+
+            while (true)
+            {
+                short[] pcm = recorder.Read();
+                CheetahTranscript transcriptObj = cheetah.Process(pcm);
+
+                if (!String.IsNullOrEmpty(transcriptObj.Transcript))
+                {
+                    Console.Write(transcriptObj.Transcript);
+                    transcriptBuilder.Append(transcriptObj.Transcript);
+                }
+
+                if (transcriptObj.IsEndpoint)
+                {
+                    CheetahTranscript finalTranscriptObj = cheetah.Flush();
+                    Console.WriteLine(finalTranscriptObj.Transcript);
+                    transcriptBuilder.Append(finalTranscriptObj.Transcript);
+
+                    // Call the method to handle Cheetah's recognition results with the whole sentence
+                    await HandleCheetahRecognitionAsync(transcriptBuilder.ToString().ToLower());
+
+                    // Clear the transcript builder for the next sentence
+                    transcriptBuilder.Clear();
+                }
+            }
+        }
+        catch (CheetahActivationLimitException)
+        {
+            Console.WriteLine($"AccessKey has reached its processing limit.");
+        }
+    }
+
     
     /// <summary>
     /// Initializes Application
     /// </summary>
     private static void Init()
     {
-        SpeechSynthesizer.SelectVoiceByHints(VoiceGender.Female);
+        string accessKey = "";
+
+        cheetah = Cheetah.Create(accessKey);
+        recorder = PvRecorder.Create(-1, cheetah.FrameLength);
+        recorder.Start();
+
+        Task.Run(ProcessAudio);
+
+        //SpeechSynthesizer.SelectVoiceByHints(VoiceGender.Female);
+        SpeechSynthesizer.SelectVoiceByHints(VoiceGender.Female, VoiceAge.NotSet, 0, CultureInfo.GetCultureInfo("en-GB"));
         SpeechSynthesizer.Rate = 3;
 
-        var vocabulary = new Choices();
-        vocabulary.Add(
-            "helix", "stop", "hello",
-            "finance", 
-            "entertain", "entertainment", "joke", "chuck norris", "cat fact", 
-            "sport", "football", "bundesliga", "formula one",
-            "good morning", "activity", "weather");
+        SpeechSynthesizerGer.SelectVoiceByHints(VoiceGender.Female, VoiceAge.NotSet, 0, CultureInfo.GetCultureInfo("de-DE"));
+        SpeechSynthesizerGer.Rate = 3;
 
-        var grammarBuilder = new GrammarBuilder();
-        grammarBuilder.Append(vocabulary);
+        //SpeechRecognitionEngine.LoadGrammar(new DictationGrammar());
+        //SpeechRecognitionEngine.SetInputToDefaultAudioDevice();
+        //SpeechRecognitionEngine.RecognizeAsync(RecognizeMode.Multiple);
 
-        var grammar = new Grammar(grammarBuilder);
-        
-        SpeechRecognitionEngine.LoadGrammar(grammar);
-        SpeechRecognitionEngine.SetInputToDefaultAudioDevice();
-        SpeechRecognitionEngine.RecognizeAsync(RecognizeMode.Multiple);
-
-        SpeechRecognitionEngine.SpeechRecognized += OnSpeechRecognizedAsync;
+        //SpeechRecognitionEngine.SpeechRecognized += OnSpeechRecognizedAsync;
         
         // events start the next day
         _timerFinance = new Timer(OnFinanceTimerElapsed, null, DateTime.Today.Add(new TimeSpan(22 + 24, 0, 0)) - DateTime.Now, TimeSpan.FromDays(1));
@@ -90,101 +159,142 @@ public static class ApplicationService
         AddBotMessage("Hey, how can I help you?");
     }
 
-    /// <summary>
-    /// Handles Speech Recognition
-    /// </summary>
-    private static async void OnSpeechRecognizedAsync(object? sender, SpeechRecognizedEventArgs e)
+
+    private static async Task HandleCheetahRecognitionAsync(string recognizedText)
     {
-        // toggle activation
-        switch (e.Result.Text.ToLower())
+        string useCase = "";
+
+        // Set of predefined grammar choices
+        HashSet<string> predefinedChoices = new HashSet<string>
         {
-            case "helix":
-                _mainWindowViewModel?.OnSpeechButtonClick();
-                break;
-            case "stop":
-                _mainWindowViewModel?.OnSpeechButtonClick();
-                IsVoiceEnabled = false;
-                break;
+            "helix", "stop", "hello",
+            "finance", 
+            "entertain", "entertainment", "joke", "chuck norris", "cat fact", 
+            "sport", "football", "bundesliga", "formula one",
+            "good morning", "activity", "weather",
+            "what are you"
+        };
+
+        // Iterate through the predefined choices and check if they are present in the input string
+        foreach (string choice in predefinedChoices)
+        {
+            if (recognizedText.Contains(choice))
+            {
+                Console.WriteLine("Match found: " + choice);
+                useCase = choice;
+            }
+        }
+
+        // Handle activation and stopping cases
+        if (recognizedText == "helix" || recognizedText == "stop")
+        {
+            _mainWindowViewModel?.OnSpeechButtonClick();
+            if (recognizedText == "stop") IsVoiceEnabled = false;
+            return;
         }
 
         if(!IsVoiceEnabled)
             return;
-        
-        switch (e.Result.Text.ToLower())
+
+        if (predefinedChoices.Contains(useCase))
+        {
+            AddUserMessage(recognizedText);
+            switch (useCase)
         {
             case "hello":
                 _mainWindowViewModel?.OnSpeechButtonClick();
-                AddUserMessage("Hello!");
+                //AddUserMessage("Hello!");
                 AddBotMessage("Greetings, what can I do for you?");
                 break;
+            case "what are you":
+                //AddUserMessage("What are you?");
+                string prompt = "You are a SMART PDA with the name HELIX, developed by the HighPerformerGang and it is a pleasure for you to help me. Explain to me in 25 or less words what you are.";
+                string gpt4Response = await GetGPT4ResponseAsync(prompt);
+                AddBotMessage(gpt4Response);
+                //AddBotMessage(gpt4Response);
+                break;
             case "finance":
-                AddUserMessage("Finance?");
+                //AddUserMessage("Finance?");
                 AddBotMessage(await GetFinanceReportAsync());
                 break;
             case "entertain":
             case "entertainment":
-                AddUserMessage("Entertainment?");
-                AddBotMessage(await GetEntertainmentAsync());
+                //AddUserMessage("Entertainment?");
+                //AddBotMessage(await GetEntertainmentAsync());
+                AddBotMessage(await GetJokeAsync(), true);
+                AddBotMessage(await GetChuckNorrisJokeAsync());
+                AddBotMessage(await GetCatFactAsync());
                 break;
             case "joke":
-                AddUserMessage("Joke?");
-                AddBotMessage(await GetJokeAsync());
+                //AddUserMessage("Joke?");
+                AddBotMessage(await GetJokeAsync(), true);
                 break;
             case "chuck norris":
-                AddUserMessage("Chuck Norris Joke?");
+                //AddUserMessage("Chuck Norris Joke?");
                 AddBotMessage(await GetChuckNorrisJokeAsync());
                 break;
             case "cat fact":
-                AddUserMessage("Cat fact?");
+                //AddUserMessage("Cat fact?");
                 AddBotMessage(await GetCatFactAsync());
                 break;
             case "sport":
-                AddUserMessage("Sports?");
+                //AddUserMessage("Sports?");
                 AddBotMessage(await GetSportsAsync());
                 ShowFootballTable();
                 break;
             case "football":
-                AddUserMessage("Football?");
+                //AddUserMessage("Football?");
                 AddBotMessage(await GetLeadingFootballTeamsAsync());
                 break;
             case "bundesliga":
-                AddUserMessage("Bundesliga?");
+                //AddUserMessage("Bundesliga?");
                 AddBotMessage("Here is the Bundesliga table");
                 ShowFootballTable();
                 break;
             case "formula one":
-                AddUserMessage("F1?");
+                //AddUserMessage("F1?");
                 AddBotMessage("Here are the leading F1 drivers: " + await GetLeadingF1Async());
                 break;
             case "good morning":
-                AddUserMessage("Good morning!");
+                //AddUserMessage("Good morning!");
                 AddBotMessage(await GetGoodMorningAsync());
                 break;
             case "activity":
-                AddUserMessage("Activity?");
+                //AddUserMessage("Activity?");
                 AddBotMessage(await GetActivityAsync());
                 break;
             case "weather":
-                AddUserMessage("Weather?");
+                //AddUserMessage("Weather?");
                 AddBotMessage(await GetWeatherAsync());
+
                 break;
         }
+        }
+        else
+        {
+            // Handle the "chat" case - unrecognized input, send it to the ChatGPT API
+            AddUserMessage(recognizedText);
+            string gptResponse = await GetGPT4ResponseAsync(recognizedText); // Assuming you have the GetGPT4ResponseAsync method implemented
+            AddBotMessage(gptResponse);
+        }
     }
-    
+
+
     /// <summary>
     /// Adds a message from the bot to the main chat.
     /// </summary>
-    private static void AddBotMessage(string message)
+    private static void AddBotMessage(string message, bool isGerman = false)
     {
         Messages.Add(new ChatMessage()
         {
             MessageText = message,
             MessageAlignment = HorizontalAlignment.Left,
-            MessageBackground = new SolidColorBrush(Color.FromRgb(123, 120, 121)),
+            //MessageBackground = new SolidColorBrush(Color.FromRgb(123, 120, 121)),
             IsBotIconVisible = true
         });
 
-        SpeechSynthesizer.SpeakAsync(message);
+        if (!isGerman) SpeechSynthesizer.SpeakAsync(message);
+        else SpeechSynthesizerGer.SpeakAsync(message);
     }
     
     /// <summary>
@@ -277,6 +387,11 @@ public static class ApplicationService
         var result = $"{joke} \n\n {cnJoke} \n\n {catFact}";
 
         return result;
+    }
+
+    private static async Task<string> GetGPT4ResponseAsync(string prompt)
+    {
+        return await GPTApi.GetInstance().GetGPT4ResponseAsync(prompt);
     }
     
     /// <summary>
