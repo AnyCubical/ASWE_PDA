@@ -7,7 +7,7 @@ public class ExchangeRateApi : ApiBase
 {
     #region Fields
 
-    private static readonly ExchangeRateApi? _instance = null;
+    private static readonly ExchangeRateApi? Instance = null;
 
     #endregion
 
@@ -22,7 +22,7 @@ public class ExchangeRateApi : ApiBase
 
     #region Public Methods
 
-    public async Task<double?> GetUSDtoEURAsync()
+    public async Task<double?> GetUsDtoEurAsync()
     {
         try
         {
@@ -46,7 +46,7 @@ public class ExchangeRateApi : ApiBase
     
     public static ExchangeRateApi GetInstance()
     {
-        return _instance ?? new ExchangeRateApi();
+        return Instance ?? new ExchangeRateApi();
     }
 
     #endregion

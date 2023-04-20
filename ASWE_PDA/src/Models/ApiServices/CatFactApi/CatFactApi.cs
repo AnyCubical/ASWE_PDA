@@ -8,7 +8,7 @@ public class CatFactApi : ApiBase
 {
     #region Fields
 
-    private static readonly CatFactApi? _instance = null;
+    private static readonly CatFactApi? Instance = null;
 
     #endregion
 
@@ -48,7 +48,7 @@ public class CatFactApi : ApiBase
     
     public static CatFactApi GetInstance()
     {
-        return _instance ?? new CatFactApi();
+        return Instance ?? new CatFactApi();
     }
 
     #endregion

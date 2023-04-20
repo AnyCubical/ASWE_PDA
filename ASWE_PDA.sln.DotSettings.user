@@ -1,7 +1,13 @@
 ﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
 	<s:Boolean x:Key="/Default/CodeInspection/Roslyn/RoslynEnabled/@EntryValue">False</s:Boolean>
-	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=73aa4186_002D6bf0_002D4600_002D84b9_002D23db207d7ef5/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="All tests from Solution" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+	<s:String x:Key="/Default/Environment/Highlighting/HighlightingSourceSnapshotLocation/@EntryValue">C:\Users\nikla\AppData\Local\JetBrains\Rider2023.1\resharper-host\temp\Rider\vAny\CoverageData\_ASWE_PDA.-1430231130\Snapshot\snapshot.utdcvr</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=73aa4186_002D6bf0_002D4600_002D84b9_002D23db207d7ef5/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" Name="All tests from Solution" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
   &lt;Solution /&gt;&#xD;
 &lt;/SessionState&gt;</s:String>
+	<s:String x:Key="/Default/Environment/UnitTesting/UnitTestSessionStore/Sessions/=b7272deb_002De2fc_002D4673_002D82b9_002Dded3e55876a2/@EntryIndexedValue">&lt;SessionState ContinuousTestingMode="0" IsActive="True" Name="HandleF1" xmlns="urn:schemas-jetbrains-com:jetbrains-ut-session"&gt;&#xD;
+  &lt;Solution /&gt;&#xD;
+&lt;/SessionState&gt;</s:String>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=hallecks/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/UserDictionary/Words/=halleck_0027s/@EntryIndexedValue">True</s:Boolean>
 	
 	</wpf:ResourceDictionary>

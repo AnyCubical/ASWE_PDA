@@ -29,21 +29,24 @@
                     <ItemsControl.ItemTemplate>
                         <DataTemplate>
                             <Grid Margin="10" HorizontalAlignment="{Binding MessageAlignment}">
-                                <Border Background="{Binding MessageBackground}" Opacity="0.2" CornerRadius="10"/>
-                                
-                                <StackPanel Orientation="Horizontal">
-                                    
+                                <Border Background="#cfcfcf" Opacity="0.2" CornerRadius="10"/>
+
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+
                                     <!-- BotIcon -->
-                                    <Image Width="60" Height="60" Margin="15,10,5,10" Source="../../Assets/helix.png"
-                                           IsVisible="{Binding IsBotIconVisible}"/>
-                                    
+                                    <Image Grid.Column="0" Width="60" Height="60" Margin="15,10,5,10" Source="../../Assets/helix.png"
+                                        IsVisible="{Binding IsBotIconVisible}"/>
+
                                     <!-- Message -->
-                                    <TextBlock Text="{Binding MessageText}" Margin="15" VerticalAlignment="Center" TextWrapping="Wrap"/>
-                                    
-                                </StackPanel>
-                                
+                                    <TextBlock Grid.Column="1" Text="{Binding MessageText}" Margin="15" VerticalAlignment="Center" TextWrapping="Wrap"/>
+                                </Grid>
                             </Grid>
                         </DataTemplate>
+
                     </ItemsControl.ItemTemplate>
                     
                 </ItemsControl>

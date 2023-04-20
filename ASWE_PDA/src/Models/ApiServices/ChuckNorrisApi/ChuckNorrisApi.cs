@@ -7,7 +7,7 @@ public class ChuckNorrisApi : ApiBase
 {
     #region Fields
 
-    private static readonly ChuckNorrisApi? _instance = null;
+    private static readonly ChuckNorrisApi? Instance = null;
 
     #endregion
 
@@ -46,7 +46,7 @@ public class ChuckNorrisApi : ApiBase
     
     public static ChuckNorrisApi GetInstance()
     {
-        return _instance ?? new ChuckNorrisApi();
+        return Instance ?? new ChuckNorrisApi();
     }
     
     #endregion

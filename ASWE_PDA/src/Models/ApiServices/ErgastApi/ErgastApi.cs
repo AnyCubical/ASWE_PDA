@@ -8,7 +8,7 @@ public class ErgastApi : ApiBase
 {
     #region Fields
 
-    private static readonly ErgastApi? _instance = null;
+    private static readonly ErgastApi? Instance = null;
 
     #endregion
 
@@ -57,7 +57,7 @@ public class ErgastApi : ApiBase
     
     public static ErgastApi GetInstance()
     {
-        return _instance ?? new ErgastApi();
+        return Instance ?? new ErgastApi();
     }
 
     #endregion

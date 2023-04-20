@@ -8,7 +8,7 @@ public class CoinPaprikaApi : ApiBase
 {
     #region Fields
 
-    private static readonly CoinPaprikaApi? _instance = null;
+    private static readonly CoinPaprikaApi? Instance = null;
 
     #endregion
 
@@ -54,7 +54,7 @@ public class CoinPaprikaApi : ApiBase
 
     public static CoinPaprikaApi GetInstance()
     {
-        return _instance ?? new CoinPaprikaApi();
+        return Instance ?? new CoinPaprikaApi();
     }
 
     #endregion

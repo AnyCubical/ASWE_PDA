@@ -7,7 +7,7 @@ public class BoredApi : ApiBase
 {
     #region Fields
 
-    private static readonly BoredApi? _instance = null;
+    private static readonly BoredApi? Instance = null;
 
     #endregion
 
@@ -47,7 +47,7 @@ public class BoredApi : ApiBase
     
     public static BoredApi GetInstance()
     {
-        return _instance ?? new BoredApi();
+        return Instance ?? new BoredApi();
     }
 
     #endregion
