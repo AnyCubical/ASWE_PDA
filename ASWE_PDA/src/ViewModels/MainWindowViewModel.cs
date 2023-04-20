@@ -48,7 +48,7 @@ public class MainWindowViewModel : ViewModelBase
         
         SpeechButtonClick = ReactiveCommand.Create(OnSpeechButtonClick);
 
-        ApplicationService._mainWindowViewModel = this;
+        ApplicationService.MainWindowViewModel = this;
     }
 
     #endregion
@@ -61,7 +61,7 @@ public class MainWindowViewModel : ViewModelBase
 
     #region Public Methods
     
-    public void OnSpeechButtonClick()
+    public virtual void OnSpeechButtonClick()
     {
         SpeechButtonIcon = SpeechButtonIcon == MaterialIconKind.Microphone ? MaterialIconKind.MicrophoneOff : MaterialIconKind.Microphone;
         SpeechButtonBrush = Equals(SpeechButtonBrush, Brushes.Green) ? Brushes.Red : Brushes.Green;

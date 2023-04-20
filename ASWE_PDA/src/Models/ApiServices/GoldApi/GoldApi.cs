@@ -8,7 +8,7 @@ public class GoldApi : ApiBase
 {
     #region Fields
 
-    private static readonly GoldApi? _instance = null;
+    private static readonly GoldApi? Instance = null;
     private const string Token = "x-access-token";
     private const string TokenValue = "goldapi-ddpfrlf28vuoo-io";
 
@@ -63,7 +63,7 @@ public class GoldApi : ApiBase
     
     public static GoldApi GetInstance()
     {
-        return _instance ?? new GoldApi();
+        return Instance ?? new GoldApi();
     }
 
     #endregion

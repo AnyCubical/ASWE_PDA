@@ -8,7 +8,7 @@ public class WitzApi : ApiBase
 {
     #region Fields
 
-    private static readonly WitzApi? _instance = null;
+    private static readonly WitzApi? Instance = null;
 
     #endregion
 
@@ -47,7 +47,7 @@ public class WitzApi : ApiBase
     
     public static WitzApi GetInstance()
     {
-        return _instance ?? new WitzApi();
+        return Instance ?? new WitzApi();
     }
 
     #endregion

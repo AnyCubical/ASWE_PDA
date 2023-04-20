@@ -5,6 +5,7 @@ using ASWE_PDA.Models.ApiServices.CoinPaprikaApi;
 using ASWE_PDA.Models.ApiServices.ErgastApi;
 using ASWE_PDA.Models.ApiServices.ExchangeRateApi;
 using ASWE_PDA.Models.ApiServices.GoldApi;
+using ASWE_PDA.Models.ApiServices.InteractivityApi;
 using ASWE_PDA.Models.ApiServices.OpenLigaDB;
 using ASWE_PDA.Models.ApiServices.WeatherStationApi;
 using ASWE_PDA.Models.ApiServices.WitzApi;
@@ -18,6 +19,16 @@ public class ApiTests
     {
         var api = CatFactApi.GetInstance();
         var result = await api.GetCatFactAsync();
+
+        Assert.NotNull(result); 
+        Assert.IsType<string>(result);
+    }
+    
+    [Fact]
+    public async void InteractivityApiTest()
+    {
+        var api = GptApi.GetInstance();
+        var result = await api.GetGpt4ResponseAsync("Marco", "Polo");
 
         Assert.NotNull(result); 
         Assert.IsType<string>(result);
@@ -57,7 +68,7 @@ public class ApiTests
     public async void ExchangeRateApiTest()
     {
         var api = ExchangeRateApi.GetInstance();
-        var result = await api.GetUSDtoEURAsync();
+        var result = await api.GetUsDtoEurAsync();
 
         Assert.NotNull(result); 
         Assert.IsType<double>(result);
@@ -74,7 +85,7 @@ public class ApiTests
     }
     
     [Fact]
-    public async void OpenLigaDBApiTest()
+    public async void OpenLigaDbApiTest()
     {
         var api = OpenLigaDbApi.GetInstance();
         var result = await api.GetLeadingTeamsAsync();
@@ -103,6 +114,7 @@ public class ApiTests
         Assert.IsType<string>(result);
     }
     
+    [Fact]
     public async void WeatherApiTest()
     {
         var api = WeatherStationApi.GetInstance();

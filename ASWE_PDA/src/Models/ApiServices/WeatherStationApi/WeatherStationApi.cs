@@ -9,7 +9,7 @@ public class WeatherStationApi : ApiBase
 {
     #region Fields
 
-    private static readonly WeatherStationApi? _instance = null;
+    private static readonly WeatherStationApi? Instance = null;
 
     #endregion
 
@@ -59,7 +59,7 @@ public class WeatherStationApi : ApiBase
     
     public static WeatherStationApi GetInstance()
     {
-        return _instance ?? new WeatherStationApi();
+        return Instance ?? new WeatherStationApi();
     }
 
     #endregion

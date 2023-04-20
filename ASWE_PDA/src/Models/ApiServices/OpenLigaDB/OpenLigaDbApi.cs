@@ -9,7 +9,7 @@ public class OpenLigaDbApi : ApiBase
 {
     #region Fields
 
-    private static readonly OpenLigaDbApi? _instance = null;
+    private static readonly OpenLigaDbApi? Instance = null;
 
     #endregion
 
@@ -55,7 +55,7 @@ public class OpenLigaDbApi : ApiBase
     
     public static OpenLigaDbApi GetInstance()
     {
-        return _instance ?? new OpenLigaDbApi();
+        return Instance ?? new OpenLigaDbApi();
     }
 
     #endregion

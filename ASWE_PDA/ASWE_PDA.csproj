@@ -34,6 +34,7 @@
         <PackageReference Include="Material.Icons.Avalonia" Version="2.0.0-preview2" />
         <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
         <PackageReference Include="Picovoice.Cheetah" Version="1.1.0" />
+        <PackageReference Include="Porcupine" Version="2.2.0" />
         <PackageReference Include="PvRecorder" Version="1.1.1" />
         <PackageReference Include="System.Speech" Version="8.0.0-preview.1.23110.8" />
         <PackageReference Include="XamlNameReferenceGenerator" Version="1.5.1" />
