@@ -478,31 +478,43 @@ private static async Task SpeakAsync(SpeechSynthesizer speechSynthesizer, string
         });
     }
 
-    private static void OnFinanceTimerElapsed(object? state)
+    private static async void OnFinanceTimerElapsed(object? state)
     {
-        Dispatcher.UIThread.Post(async () =>
+        var triggern = GoogleCalendarApi.GetInstance().IsMeetingInProgressAsync();
+        if (! await triggern)
         {
-            await AddBotMessage("Hey it's 21:00! Here is your daily financial update. ");
-            await AddBotMessage(await GetFinanceReportAsync());
-        });
+            Dispatcher.UIThread.Post(async () =>
+            {
+                await AddBotMessage("Hey it's 21:00! Here is your daily financial update. ");
+                await AddBotMessage(await GetFinanceReportAsync());
+            });
+        }
     }
     
-    private static void OnSportsTimerElapsed(object? state)
+    private static async void OnSportsTimerElapsed(object? state)
     {
-        Dispatcher.UIThread.Post(async () =>
+        var triggern = GoogleCalendarApi.GetInstance().IsMeetingInProgressAsync();
+        if (! await triggern)
         {
-            await AddBotMessage("Hey it's Sunday 18:00! Here is your weekly sports update. ");
-            await AddBotMessage(await GetSportsAsync());
-        });
+            Dispatcher.UIThread.Post(async () =>
+            {
+                await AddBotMessage("Hey it's Sunday 18:00! Here is your weekly sports update. ");
+                await AddBotMessage(await GetSportsAsync());
+            });
+        }
     }
     
-    private static void OnGoodMorningTimerElapsed(object? state)
+    private static async void OnGoodMorningTimerElapsed(object? state)
     {
-        Dispatcher.UIThread.Post(async () =>
+        var triggern = GoogleCalendarApi.GetInstance().IsMeetingInProgressAsync();
+        if (! await triggern)
         {
-            await AddBotMessage("Hey it's 6:00! Here is your daily update. ");
-            await AddBotMessage(await GetGoodMorningAsync());
-        });
+            Dispatcher.UIThread.Post(async () =>
+            {
+                await AddBotMessage("Hey it's 6:00! Here is your daily update. ");
+                await AddBotMessage(await GetGoodMorningAsync());
+            });
+        }
     }
     
     #endregion
